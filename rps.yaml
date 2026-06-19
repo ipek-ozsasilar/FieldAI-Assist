@@ -1,0 +1,134 @@
+# === Komutları nereden görürsün? ===
+#   dart run rps ls          -> tüm rps komutları + kısa açıklama
+#   dart run tool/bootstrap.dart help  -> sadece bootstrap (tool) alt komutları
+# Tanımlar: bu dosya (rps). Uzun dosya/klasör işi: tool/bootstrap/*.dart
+#
+# Proje kökünden: dart run rps <komut>
+#
+# Ortam (isteğe bağlı):
+#   FLUTTER_VERSION=stable   — pin_flutter için
+#   ORG, DESCRIPTION         — şablon / dokümantasyon (ileride kullanım)
+#
+# Bootstrap: önce yeni klon / boş proje; mevcut main.dart için:
+#   dart run tool/bootstrap.dart all --force
+#
+# Not: Açıklamada "anahtar: değer" yazacaksan $description satırını çift tırnak içine al.
+#
+# Elle sıra: fvm_setup veya pin_flutter (ikisi de FVM) → add_dependencies → ...
+# Hata yutulmaz; bir komut düşerse script exit eder, sonraki adım çalışmaz.
+scripts:
+  bootstrap:
+    $description: "Pin → paketler → config → klasör → vscode → codegen (tam kurulum)"
+    $script: dart run tool/bootstrap.dart all
+
+  bootstrap_force:
+    $description: "Bootstrap + mevcut main/env/service_locator üzerine yazar"
+    $script: dart run tool/bootstrap.dart all --force
+
+  fvm_setup:
+    $description: "FVM zorunlu adımlar; biri düşerse durur (activate, install, use, .fvm)"
+    $script: dart run tool/bootstrap.dart fvm_setup
+
+  pin_flutter:
+    $description: "FVM ile sabitleme (fvm_setup ile aynı; pub.dev sidekick CLI kullanılmaz)"
+    $script: dart run tool/bootstrap.dart pin
+
+  add_dependencies:
+    $description: "get_it, firebase (core, auth, firebase_ui_auth, firestore, storage, messaging), codegen; firebase_dynamic_links eklenmez"
+    $script: dart run tool/bootstrap.dart deps
+
+  write_files:
+    $description: "analysis_options, build.yaml, flutter_gen.yaml, .env şablonlari"
+    $script: dart run tool/bootstrap.dart write
+
+  create_structure:
+    $description: "core/features/models/product, assets, prompts, skills, gen"
+    $script: dart run tool/bootstrap.dart structure
+
+  write_vscode:
+    $description: ".vscode launch (flavor dart-define) + settings"
+    $script: dart run tool/bootstrap.dart vscode
+
+  gitignore_env:
+    $description: ".gitignore içine .env kuralları"
+    $script: dart run tool/bootstrap.dart gitignore
+
+  pubspec_assets:
+    $description: "pubspec.yaml için assets klasörleri (yoksa ekle)"
+    $script: dart run tool/bootstrap.dart pubspec_assets
+
+  write_starter:
+    $description: "main, env, service_locator şablonu (dosyalar varsa atlanır, hata vermez) — üzerine yaz: write_starter_force"
+    $script: dart run tool/bootstrap.dart starter
+
+  write_starter_force:
+    $description: "starter dosyalarını yani initiliaze dosyalarını(get_it, env, service_locator, firebase init) mevcut üzerine yazar"
+    $script: dart run tool/bootstrap.dart starter --force
+
+  gen_flutter:
+    $description: "flutter pub get + build_runner (json_serializable, envied, flutter_gen)"
+    $before: flutter pub get
+    $script: dart run tool/bootstrap.dart gen
+
+  gen_flutter_watch:
+    $description: "build_runner watch"
+    $script: dart run build_runner watch --delete-conflicting-outputs
+
+  get:
+    $description: "flutter pub get"
+    $script: flutter pub get
+
+  format:
+    $description: "lib ve test formatla"
+    $script: dart format lib test
+
+  analyze:
+    $description: "flutter analyze"
+    $script: flutter analyze
+
+  pre_ui:
+    $description: "get → format → analyze (ekran öncesi)"
+    $before: flutter pub get
+    $script: dart format lib test
+    $after: flutter analyze
+
+  gen: rps gen_flutter
+
+  clean:
+    $description: "flutter clean"
+    $script: flutter clean
+
+  pub_get:
+    $description: "flutter pub get"
+    $script: flutter pub get
+
+  run_app:
+    $description: "flutter run"
+    $script: flutter run
+
+  reset:
+    $description: "clean + pub get"
+    $script: |
+      flutter clean
+      flutter pub get
+
+  build_all:
+    $description: "clean + get + build_runner"
+    $script: |
+      flutter clean
+      flutter pub get
+      dart run build_runner build --delete-conflicting-outputs
+
+  build_apk:
+    $description: "Release APK"
+    $script: flutter build apk
+
+  install_apk:
+    $description: "Debug APK yükle (adb gerekli)"
+    $script: adb install -r build/app/outputs/flutter-apk/app-debug.apk
+
+  clean_get:
+    $description: "clean + get (kısayol)"
+    $script: |
+      flutter clean
+      flutter pub get
