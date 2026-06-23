@@ -6,7 +6,10 @@ const jobController = require("../controllers/jobController");
 //Yani server.js içine bütün endpointleri yazmak yerine, jobs ile ilgili endpointleri ayrı bir kutuya koyuyoruz.
 const router = express.Router();
 
-///today adresine GET isteği gelirse jobController.getTodayJobs fonksiyonunu çalıştır.
+///today adresine GET isteği gelirse express jobController.getTodayJobs fonksiyonunu çalıştır.
+//Sen burada fonksiyonu çağırmıyorsun, Express’e teslim ediyorsun. Express, /today adresine GET isteği gelirse
+//bu fonksiyonu sen çağır. O yüzden parametreler yok mesela suan fonksıyon ıcınde 
+//Express req ve res’i HTTP isteği geldiği anda Node.js’in kendi HTTP sistemi üzerinden alıyor.
 router.get("/today", jobController.getTodayJobs);
 
 module.exports = router;

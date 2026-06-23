@@ -1,6 +1,24 @@
+//DB verisini AI’a context olarak verip structured output alıyoruz.
+//zod, gelen verinin beklediğimiz formata uyup uymadığını kontrol eden validation kütüphanesi.
 const { z } = require("zod");
 const openai = require("../config/openaiClient");
 
+//AI’dan beklediğimiz JSON formatını tanımlıyoruz
+/*
+I cevabı şöyle bir obje olmalı:
+
+{
+  "summary": "string",
+  "priorities": [
+    {
+      "jobId": "string",
+      "priority": "high | medium | low",
+      "reason": "string",
+      "suggestedAction": "string"
+    }
+  ]
+}
+*/
 const AiJobPrioritySchema = z.object({
   summary: z.string(),
   priorities: z.array(
@@ -52,23 +70,29 @@ Beklenen JSON formatı:
 Bugünkü servis işleri:
 ${JSON.stringify(jobs, null, 2)}
 `;
+// ${JSON.stringify(jobs, null, 2)} Bu satır jobs array’ini okunabilir JSON metnine çevirip prompt içine koyuyor. 
 
+  //Burada OpenAI’ye istek atıyorsun.
   const response = await openai.responses.create({
     model: "gpt-4.1-mini",
     input: prompt,
   });
-
+  //AI cevabını text olarak alıyoruz
   const rawText = response.output_text;
-
+  //Burada birazdan JSON parse sonucunu tutacak değişkeni hazırlıyoruz.
   let parsed;
 
   try {
+    //JSON.parse ile metni objeye çeviriyoruz Bu dışarıdan bakınca JSON gibi görünüyor ama JavaScript için hâlâ düz yazı/metin.
+    //rawText string olduğu için bunu JavaScript objesine çevirmemiz gerekiyor.
     parsed = JSON.parse(rawText);
-  } catch (error) {
+  }
+  //Ama AI bazen JSON dışında metin dönerse: Bu valid JSON değildir. O zaman JSON.parse hata verir. Sen de bunu yakalıyorsun.
+  catch (error) {
     console.error("AI JSON parse error. Raw output:", rawText);
     throw new Error("AI_PRIORITY_INVALID_JSON");
   }
-
+  //Burada parse edilmiş JSON’un gerçekten beklenen schema’ya uyup uymadığını kontrol ediyoruz.
   const validated = AiJobPrioritySchema.parse(parsed);
 
   return validated;

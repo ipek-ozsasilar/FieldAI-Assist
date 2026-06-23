@@ -2,6 +2,15 @@
 //Başarılıysa JSON dön. Hata varsa standart hata response’u dön.
 const jobService = require("../services/jobService");
 
+//res, HTTP isteğine cevap göndermek için Express’in verdiği response nesnesidir.
+//res = Backend’den client’a gönderilecek HTTP cevap aracı
+//req bir nesnedir. İçinde isteğin bilgileri vardır. console.log(req.method); // "GET"
+//res, client’a cevap göndermek için Express’in verdiği araç.
+/*  res = {
+  json: function(...) {},
+  status: function(...) {},
+  send: function(...) {}
+}*/
 async function getTodayJobs(req, res) {
   try {
     const jobs = await jobService.getTodayJobs();
@@ -12,7 +21,8 @@ async function getTodayJobs(req, res) {
     });
   } catch (error) {
     console.error("GET /api/jobs/today error:", error);
-
+    
+    //500 şu demek: Backend tarafında beklenmeyen hata oluştu.
     return res.status(500).json({
       success: false,
       errorCode: "JOBS_FETCH_FAILED",

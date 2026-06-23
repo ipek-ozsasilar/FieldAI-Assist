@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../jobs/models/ai_priority_model.dart';
 import '../../../models/job.dart';
 
 class JobCard extends StatelessWidget {
-  const JobCard({super.key, required this.job});
+  const JobCard({super.key, required this.job, this.aiPriority});
 
   final Job job;
+  final AiJobPriority? aiPriority;
 
   @override
   Widget build(BuildContext context) {
-    if (job.isAiSuggestedPriority) {
-      return _PriorityJobCard(job: job);
+    if (job.isAiSuggestedPriority || aiPriority != null) {
+      return _PriorityJobCard(job: job, aiPriority: aiPriority);
     }
     return _StandardJobCard(job: job);
   }
@@ -85,12 +87,16 @@ class _StandardJobCard extends StatelessWidget {
 }
 
 class _PriorityJobCard extends StatelessWidget {
-  const _PriorityJobCard({required this.job});
+  const _PriorityJobCard({required this.job, required this.aiPriority});
 
   final Job job;
+  final AiJobPriority? aiPriority;
 
   @override
   Widget build(BuildContext context) {
+    final reason = aiPriority?.reason ?? job.reason;
+    final suggestedAction = aiPriority?.suggestedAction;
+
     return Container(
       decoration: BoxDecoration(
         color: AppColors.priorityCardBg,
@@ -106,9 +112,7 @@ class _PriorityJobCard extends StatelessWidget {
       ),
       foregroundDecoration: BoxDecoration(
         borderRadius: BorderRadius.circular(14),
-        border: const Border(
-          left: BorderSide(color: AppColors.teal, width: 4),
-        ),
+        border: const Border(left: BorderSide(color: AppColors.teal, width: 4)),
       ),
       child: Stack(
         children: [
@@ -141,6 +145,10 @@ class _PriorityJobCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 8),
+                    if (aiPriority != null) ...[
+                      _AiPriorityBadge(priority: aiPriority!.priority),
+                      const SizedBox(width: 8),
+                    ],
                     _StatusBadge(status: job.status),
                   ],
                 ),
@@ -153,10 +161,21 @@ class _PriorityJobCard extends StatelessWidget {
                     color: AppColors.textPrimary,
                   ),
                 ),
-                if (job.reason != null) ...[
+                if (reason != null && reason.isNotEmpty) ...[
                   const SizedBox(height: 8),
                   Text(
-                    'Reason: ${job.reason}',
+                    'Reason: $reason',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      height: 1.4,
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+                if (suggestedAction != null && suggestedAction.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    'Suggested Action: $suggestedAction',
                     style: const TextStyle(
                       fontSize: 13,
                       height: 1.4,
@@ -193,6 +212,44 @@ class _PriorityJobCard extends StatelessWidget {
   }
 }
 
+class _AiPriorityBadge extends StatelessWidget {
+  const _AiPriorityBadge({required this.priority});
+
+  final String priority;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = getPriorityColor(priority);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Text(
+        priority.toUpperCase(),
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.bold,
+          fontSize: 10,
+        ),
+      ),
+    );
+  }
+}
+
+Color getPriorityColor(String priority) {
+  switch (priority) {
+    case 'high':
+      return Colors.red;
+    case 'medium':
+      return Colors.orange;
+    default:
+      return Colors.green;
+  }
+}
+
 class _StatusBadge extends StatelessWidget {
   const _StatusBadge({required this.status});
 
@@ -201,11 +258,7 @@ class _StatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final (label, bg, fg) = switch (status) {
-      JobStatus.inProgress => (
-        'IN PROGRESS',
-        AppColors.teal,
-        AppColors.white,
-      ),
+      JobStatus.inProgress => ('IN PROGRESS', AppColors.teal, AppColors.white),
       JobStatus.scheduled => (
         'SCHEDULED',
         AppColors.scheduledBadgeBg,
@@ -255,10 +308,7 @@ class _DetailColumn extends StatelessWidget {
       children: [
         Text(
           label,
-          style: const TextStyle(
-            fontSize: 12,
-            color: AppColors.textSecondary,
-          ),
+          style: const TextStyle(fontSize: 12, color: AppColors.textSecondary),
         ),
         const SizedBox(height: 4),
         Text(

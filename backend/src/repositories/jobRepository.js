@@ -23,9 +23,11 @@ async function getTodayJobs() {
   `;
 
   const result = await pool.query(query);
+  //Sadece satırları döndürüyoruz
   return result.rows;
 }
 
+//Fonksiyonu dışarı açıyoruz
 module.exports = {
   getTodayJobs,
 };

@@ -24,4 +24,29 @@ class Job {
   final bool isAiSuggestedPriority;
 
   String get displayId => 'JOB-$id';
+
+  factory Job.fromJson(Map<String, dynamic> json) {
+    return Job(
+      id: '${json['id'] ?? ''}',
+      customerName: json['customer_name'] ?? '',
+      deviceModel: json['device_model'] ?? '',
+      location: json['location'],
+      issue: json['issue_title'],
+      status: _parseStatus(json['status']),
+    );
+  }
+
+  static JobStatus _parseStatus(dynamic value) {
+    final status = '${value ?? ''}'.toLowerCase().replaceAll('-', '_');
+
+    if (status.contains('urgent')) {
+      return JobStatus.urgent;
+    }
+
+    if (status.contains('progress')) {
+      return JobStatus.inProgress;
+    }
+
+    return JobStatus.scheduled;
+  }
 }
