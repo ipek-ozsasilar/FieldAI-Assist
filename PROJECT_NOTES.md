@@ -137,3 +137,247 @@ Bizim `.bat` dosyamız PostgreSQL server’ı başlatmak için kullanılır.
 @echo off
 "C:\Program Files\PostgreSQL\18\bin\pg_ctl.exe" start -D "C:\Users\HP\postgres-data"
 pause
+
+Bu ekranlar projede neyi temsil ediyor?
+
+Paylaştığın UI’lar aslında ileride öğreneceğimiz konular için çok güzel ürün karşılığı oluşturuyor.
+
+1. Home ekranı
+
+Buradaki:
+
+AI INSIGHT
+High-risk part detected
+Job #1004 requires specialized cooling tools.
+
+şu konulara bağlanacak:
+
+AI job prioritization
+structured output
+risk scoring
+AI summary
+backend üzerinden güvenli LLM çağrısı
+
+Burada AI sadece metin üretmeyecek. Backend şuna benzer structured data dönecek:
+
+{
+  "summary": "High-risk part detected",
+  "highlightedJobId": "JOB-1004",
+  "priority": "high",
+  "reason": "Similar hydraulic failures caused downtime in recent warehouse jobs."
+}
+
+Flutter bunu karta, badge’e ve uyarıya çevirecek.
+
+2. Job detail ekranı
+
+Buradaki:
+
+Start AI Diagnosis
+Device Model
+Serial Number
+Issue Summary
+Service History
+Documentation
+
+ileride şu konulara bağlanacak:
+
+RAG
+embedding
+vector database
+source citation
+job diagnosis
+technical document retrieval
+
+Yani AI diagnosis yaparken sadece prompt’a güvenmeyeceğiz.
+
+Akış şöyle olacak:
+
+Job detail data
+↓
+Device model + error code + issue summary
+↓
+Embedding search
+↓
+Vector database içinde ilgili manual/chunk bulunur
+↓
+LLM bu kaynaklara dayanarak diagnosis üretir
+↓
+Kaynaklarıyla birlikte Flutter’a döner
+
+Örneğin:
+
+{
+  "diagnosis": "E42 error detected. Likely a fan speed sensor issue.",
+  "confidence": "medium",
+  "recommendedSteps": [
+    "Enter Safe Mode",
+    "Check Fan Connector",
+    "Measure Sensor Voltage"
+  ],
+  "sources": [
+    {
+      "title": "MX-200 Manual",
+      "page": 14
+    },
+    {
+      "title": "Sensor Guide",
+      "section": "3.2"
+    }
+  ]
+}
+
+Bu artık klasik chatbot değil; kaynaklı AI diagnosis sistemi.
+
+3. Analysis Complete ekranı
+
+Bu ekran tam olarak ilerideki RAG + structured output ekranı.
+
+Buradaki parçalar:
+
+Diagnosis Summary
+Recommended Steps
+Verification Sources
+Visual Reference
+Create Service Note
+Request Part
+
+şu kavramlara bağlanacak:
+
+RAG
+tool calling
+controlled actions
+user confirmation
+AI safety
+source citation
+structured output
+
+Özellikle iki buton çok önemli:
+
+Create Service Note
+Request Part: Fan Sensor
+
+Bunlar ileride tool calling ile yapılacak.
+
+Ama kritik nokta şu:
+
+AI kendi kafasına göre DB’ye yazmayacak.
+
+Doğru akış:
+
+AI önerir
+↓
+Backend tool action taslağı oluşturur
+↓
+Flutter kullanıcıya confirmation ekranı gösterir
+↓
+Kullanıcı onaylar
+↓
+Backend yetki kontrolü yapar
+↓
+DB’ye yazar / CRM’e sync eder
+
+Yani:
+
+AI → öneri
+Kullanıcı → onay
+Backend → güvenli aksiyon
+4. Confirm Service Note ekranı
+
+Bu ekran çok doğru düşünülmüş.
+
+Buradaki:
+
+AI VERIFIED ACTION
+Safety Confirmation
+Save and Sync
+
+şu konulara bağlanacak:
+
+human-in-the-loop
+critical action confirmation
+tool abuse prevention
+insecure output handling önleme
+audit log
+CRM sync
+
+AI servis notu oluşturabilir ama doğrudan kaydetmemeli.
+
+Yanlış:
+
+AI servis notunu üretti
+↓
+Otomatik DB’ye yazdı
+
+Doğru:
+
+AI servis notu taslağı üretir
+↓
+Teknisyen düzenler/onaylar
+↓
+Safety confirmation işaretlenir
+↓
+Backend kaydeder
+↓
+Audit log tutulur
+
+Bu gerçek sektörde çok önemli. Çünkü AI hatalı not yazarsa operasyonel risk doğar.
+
+5. Developer Debug Panel
+
+Bu ekran müthiş değerli çünkü seni “sadece UI yaptım” seviyesinden çıkarır.
+
+Buradaki:
+
+Total Usage
+Avg Latency
+Input tokens
+Output tokens
+Cost
+Tools
+Timeout
+Model
+Live Trace
+
+ileride şu konulara bağlanacak:
+
+AI observability
+token tracking
+cost tracking
+latency logging
+tool call logs
+agent trace
+evals
+fallback
+timeout handling
+
+Bu ekranı portföyde göstermek çok güçlü olur.
+
+Mülakatta şöyle anlatırsın:
+
+AI isteklerini sadece çalıştırmakla kalmadım; model, token usage, latency, cost, tool calls ve error durumlarını loglayan bir developer telemetry paneli tasarladım.
+
+Bu junior biri için çok ayırt edici.
+
+Öğreneceğimiz büyük AI kavramlarını projeye nasıl bağlayacağız?
+
+Bu projede sırayla şunları ekleyeceğiz:
+
+1. Backend üzerinden güvenli LLM API çağrısı
+2. Structured output
+3. Zod validation
+4. AI priority analysis
+5. AI diagnosis
+6. RAG temeli
+7. Embedding oluşturma
+8. pgvector veya Qdrant ile vector search
+9. Chunking + metadata
+10. Source citation
+11. Tool calling
+12. Controlled agent workflow
+13. Human confirmation
+14. MCP mantığı
+15. AI request logging
+16. Token / latency / cost tracking
+17. Evals
+18. AI security

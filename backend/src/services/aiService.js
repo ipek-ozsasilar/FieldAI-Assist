@@ -31,6 +31,7 @@ const AiJobPrioritySchema = z.object({
   ),
 });
 
+//structured outputu suan prompt ıcınde belırtıp ıstıyoruz
 async function prioritizeTodayJobs(jobs) {
   if (!jobs || jobs.length === 0) {
     return {
@@ -71,6 +72,7 @@ Bugünkü servis işleri:
 ${JSON.stringify(jobs, null, 2)}
 `;
 // ${JSON.stringify(jobs, null, 2)} Bu satır jobs array’ini okunabilir JSON metnine çevirip prompt içine koyuyor. 
+//Yani jobs verisini prompt’un içine koyup modele gönderdiğimiz anda AI’a context vermiş oluyoruz.
 
   //Burada OpenAI’ye istek atıyorsun.
   const response = await openai.responses.create({
@@ -92,9 +94,9 @@ ${JSON.stringify(jobs, null, 2)}
     console.error("AI JSON parse error. Raw output:", rawText);
     throw new Error("AI_PRIORITY_INVALID_JSON");
   }
-  //Burada parse edilmiş JSON’un gerçekten beklenen schema’ya uyup uymadığını kontrol ediyoruz.
+  //Burada parse edilmiş JSON’un gerçekten beklenen schema’ya uyup uymadığını kontrol ediyoruz. Structed Output valıdatıon edıyoruz
   const validated = AiJobPrioritySchema.parse(parsed);
-
+  // Hata olursa validated oluşmaz. Böylece return validatd dönmez.
   return validated;
 }
 

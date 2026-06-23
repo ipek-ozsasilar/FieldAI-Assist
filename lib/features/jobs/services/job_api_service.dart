@@ -9,14 +9,15 @@ import '../models/ai_priority_model.dart';
 class JobApiService {
   static String get baseUrl {
     if (kIsWeb) {
-      return 'http://localhost:3000';
+      //http://localhost:3000
+      return 'http://10.0.2.2:3000';
     }
 
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return 'http://127.0.0.1:3000';
+      return 'http://10.0.2.2:3000';
     }
 
-    return 'http://localhost:3000';
+    return 'http://10.0.2.2:3000';
   }
 
   Future<List<Job>> getTodayJobs() async {
