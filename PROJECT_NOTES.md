@@ -205,6 +205,50 @@ LLM bu kaynaklara dayanarak diagnosis üretir
 ↓
 Kaynaklarıyla birlikte Flutter’a döner
 
+1. Backend Supabase Storage’dan PDF’i indirir.
+
+2. Backend PDF içindeki yazıyı çıkarır.
+
+3. Backend yazıyı chunk’lara böler.
+
+4. Her chunk PostgreSQL’e kaydedilir.
+   Çünkü gerçek metni, sayfa bilgisini, doküman bilgisini tutmalıyız.
+
+5. Her chunk için embedding oluşturulur.
+   Yani metin sayı listesine çevrilir.
+
+6. Embedding Qdrant’a kaydedilir.
+   Çünkü semantic search orada yapılır.
+
+7. Start AI Diagnosis basılınca:
+   job context hazırlanır.
+   Örnek query oluşturulur:
+   "MX-200 E42 fan sensor error"
+
+8. Bu query için embedding oluşturulur.
+
+9. Qdrant’ta en yakın chunk’lar aranır.
+
+10. Qdrant bize en alakalı chunk id’lerini döner.
+
+11. Backend PostgreSQL’den bu chunk’ların gerçek metinlerini alır.
+
+12. LLM’e şu verilir:
+   - job bilgisi
+   - ilgili kaynak chunk metinleri
+   - output formatı
+
+13. AI structured diagnosis döner.
+
+PostgreSQL
+→ job, document, document_chunks metinleri
+
+Supabase Storage
+→ PDF dosyaları
+
+Qdrant
+→ embedding/vector araması
+
 Örneğin:
 
 {
@@ -381,3 +425,9 @@ Bu projede sırayla şunları ekleyeceğiz:
 16. Token / latency / cost tracking
 17. Evals
 18. AI security
+
+Supabase Storage
+→ Sadece PDF / fotoğraf dosyalarını tutuyor.
+
+PostgreSQL
+→ Job, device, document metadata, service history ve AI tablolarını tutuyor.

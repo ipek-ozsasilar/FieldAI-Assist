@@ -1,10 +1,11 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../../models/job.dart';
 import '../models/ai_priority_model.dart';
+import '../models/job_detail_model.dart';
 
 class JobApiService {
   static String get baseUrl {
@@ -70,5 +71,30 @@ class JobApiService {
     final ai = data['ai'] as Map<String, dynamic>? ?? {};
 
     return AiPriorityResult.fromJson({...ai, 'jobs': data['jobs'] ?? []});
+  }
+
+  Future<JobDetail> getJobDetail(String jobId) async {
+    final uri = Uri.parse('$baseUrl/api/jobs/$jobId');
+
+    final response = await http.get(uri);
+
+    if (response.statusCode != 200) {
+      debugPrint(
+        'Job detail request failed. '
+        'Status: ${response.statusCode}, Body: ${response.body}',
+      );
+      throw Exception('Job detail could not be loaded.');
+    }
+
+    final Map<String, dynamic> data = jsonDecode(response.body);
+
+    if (data['success'] != true) {
+      debugPrint(
+        'Backend job detail returned success=false. Body: ${response.body}',
+      );
+      throw Exception(data['message'] ?? 'Job detail request failed.');
+    }
+
+    return JobDetailResponse.fromJson(data).job;
   }
 }

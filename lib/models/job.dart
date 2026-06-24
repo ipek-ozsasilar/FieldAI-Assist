@@ -23,15 +23,16 @@ class Job {
   final String? reason;
   final bool isAiSuggestedPriority;
 
-  String get displayId => 'JOB-$id';
+  String get displayId => id.toUpperCase().startsWith('JOB-') ? id : 'JOB-$id';
 
   factory Job.fromJson(Map<String, dynamic> json) {
     return Job(
       id: '${json['id'] ?? ''}',
-      customerName: json['customer_name'] ?? '',
-      deviceModel: json['device_model'] ?? '',
+      customerName: json['customerName'] ?? json['customer_name'] ?? '',
+      deviceModel: json['deviceModel'] ?? json['device_model'] ?? '',
       location: json['location'],
-      issue: json['issue_title'],
+      time: json['scheduledDate'] ?? json['scheduled_date'],
+      issue: json['issueTitle'] ?? json['issue_title'],
       status: _parseStatus(json['status']),
     );
   }

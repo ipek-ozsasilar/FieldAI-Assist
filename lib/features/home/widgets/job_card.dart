@@ -5,24 +5,26 @@ import '../../jobs/models/ai_priority_model.dart';
 import '../../../models/job.dart';
 
 class JobCard extends StatelessWidget {
-  const JobCard({super.key, required this.job, this.aiPriority});
+  const JobCard({super.key, required this.job, this.aiPriority, this.onOpen});
 
   final Job job;
   final AiJobPriority? aiPriority;
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context) {
     if (job.isAiSuggestedPriority || aiPriority != null) {
-      return _PriorityJobCard(job: job, aiPriority: aiPriority);
+      return _PriorityJobCard(job: job, aiPriority: aiPriority, onOpen: onOpen);
     }
-    return _StandardJobCard(job: job);
+    return _StandardJobCard(job: job, onOpen: onOpen);
   }
 }
 
 class _StandardJobCard extends StatelessWidget {
-  const _StandardJobCard({required this.job});
+  const _StandardJobCard({required this.job, required this.onOpen});
 
   final Job job;
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +81,7 @@ class _StandardJobCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          _OpenJobButton(outlined: isScheduled),
+          _OpenJobButton(outlined: isScheduled, onOpen: onOpen),
         ],
       ),
     );
@@ -87,10 +89,15 @@ class _StandardJobCard extends StatelessWidget {
 }
 
 class _PriorityJobCard extends StatelessWidget {
-  const _PriorityJobCard({required this.job, required this.aiPriority});
+  const _PriorityJobCard({
+    required this.job,
+    required this.aiPriority,
+    required this.onOpen,
+  });
 
   final Job job;
   final AiJobPriority? aiPriority;
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -202,7 +209,7 @@ class _PriorityJobCard extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const _OpenJobButton(outlined: false),
+                _OpenJobButton(outlined: false, onOpen: onOpen),
               ],
             ),
           ),
@@ -325,9 +332,10 @@ class _DetailColumn extends StatelessWidget {
 }
 
 class _OpenJobButton extends StatelessWidget {
-  const _OpenJobButton({required this.outlined});
+  const _OpenJobButton({required this.outlined, required this.onOpen});
 
   final bool outlined;
+  final VoidCallback? onOpen;
 
   @override
   Widget build(BuildContext context) {
@@ -335,7 +343,7 @@ class _OpenJobButton extends StatelessWidget {
       return SizedBox(
         width: double.infinity,
         child: OutlinedButton(
-          onPressed: () {},
+          onPressed: onOpen,
           style: OutlinedButton.styleFrom(
             foregroundColor: AppColors.primaryNavy,
             side: const BorderSide(color: AppColors.primaryNavy, width: 1.5),
@@ -362,7 +370,7 @@ class _OpenJobButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       child: FilledButton(
-        onPressed: () {},
+        onPressed: onOpen,
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.primaryNavy,
           foregroundColor: AppColors.white,

@@ -1,7 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../models/job.dart';
+import '../jobs/job_detail_screen.dart';
 import '../jobs/models/ai_priority_model.dart';
 import '../jobs/services/job_api_service.dart';
 import 'data/mock_home_data.dart';
@@ -268,7 +269,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 14),
-                        child: JobCard(job: job, aiPriority: aiPriority),
+                        child: JobCard(
+                          job: job,
+                          aiPriority: aiPriority,
+                          onOpen: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => JobDetailScreen(jobId: job.id),
+                              ),
+                            );
+                          },
+                        ),
                       );
                     }),
                 ],
