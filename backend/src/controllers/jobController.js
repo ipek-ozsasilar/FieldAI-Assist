@@ -31,6 +31,37 @@ async function getTodayJobs(req, res) {
   }
 }
 
+async function getJobDetail(req, res) {
+  try {
+    const { jobId } = req.params;
+
+    const job = await jobService.getJobDetail(jobId);
+
+    if (!job) {
+      return res.status(404).json({
+        success: false,
+        errorCode: "JOB_NOT_FOUND",
+        message: "Servis işi bulunamadı.",
+      });
+    }
+
+    return res.json({
+      success: true,
+      job,
+    });
+  } catch (error) {
+    console.error("GET /api/jobs/:jobId error:", error);
+
+    return res.status(500).json({
+      success: false,
+      errorCode: "JOB_DETAIL_FETCH_FAILED",
+      message: "Servis işi detayı alınamadı.",
+      detail: error.message,
+    });
+  }
+}
+
 module.exports = {
   getTodayJobs,
+  getJobDetail,
 };
